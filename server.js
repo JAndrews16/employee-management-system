@@ -1,4 +1,4 @@
-var mysql = require("mysql");
+const mysql = require("mysql");
 const inquirer = require("inquirer");
 const Employee = require("./lib/employee");
 const Role = require("./lib/role");
@@ -8,7 +8,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "deuX17**",
+  password: "",
   database: "companyDB"
 });
 
@@ -35,15 +35,15 @@ function addNewEmployee(first_name, last_name, role_id, manager_id) {
   );
 }
 
-function addNewRole(role_id, title, salary, department_id) {
+function addNewRole(theroleid, thetitle, thesalary, thedepartmentid) {
   console.log("Adding a new role...\n");
   var query = connection.query(
     "INSERT INTO role SET ?",
     {
-      role_id: role_id,
-      title: title,
-      salary: salary,
-      department_id: department_id
+      role_id: theroleid,
+      title: thetitle,
+      salary: thesalary,
+      department_id: thedepartmentid
     },
     function(err, res) {
       if (err) throw err;
