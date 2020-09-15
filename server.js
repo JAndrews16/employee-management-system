@@ -8,87 +8,69 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "",
+  password: "deuX17**",
   database: "companyDB"
 });
 
 connection.connect(function(error) {
   if (error) throw error;
   console.log("connected as id " + connection.threadId + "\n");
+
+  readEmployeeList();
   start();
 });
 
 function addNewEmployee(first_name, last_name, role_id, manager_id) {
   console.log("Adding a new employee...\n");
   var query = connection.query(
-    "INSERT INTO employee SET ?",
-    {
-      first_name: first_name,
-      last_name: last_name,
-      role_id: role_id,
-      manager_id: manager_id
-    },
-    function(err, res) {
+    `INSERT INTO employee(id, first_name, last_name, role_id, manager_id) VALUES (${first_name}, ${last_name}, ${role_id}, ${manager_id})`);
+
+    connection.query(query, function(req, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " employee inserted!\n");
-    }
-  );
+
+      console.log("New employee has been added");
+      start();
+    })
 }
 
-function addNewRole(theroleid, thetitle, thesalary, thedepartmentid) {
+function addNewRole(thetitle, thesalary, thedepartmentid) {
   console.log("Adding a new role...\n");
   var query = connection.query(
-    "INSERT INTO role SET ?",
-    {
-      role_id: theroleid,
-      title: thetitle,
-      salary: thesalary,
-      department_id: thedepartmentid
-    },
-    function(err, res) {
+    `INSERT INTO role(title, salary, department_id) VALUES (${thetitle}, ${thesalary}, ${thedepartmentid})`);
+
+    connection.query(query, function(req, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " employee inserted!\n");
-    }
-  );
+
+      console.log("New role has been added");
+      start();
+    })
 }
 
-function addNewDepartment(department_id, name) {
+function addNewDepartment(departmentName) {
   console.log("Adding a new department...\n");
   var query = connection.query(
-    "INSERT INTO employee SET ?",
-    {
-      department_id: department_id,
-      name: name
-    },
-    function(err, res) {
+    `INSERT INTO department(name) VALUES (${departmentName})`);
+
+    connection.query(query, function(req, res) {
       if (err) throw err;
-      console.log(res.affectedRows + " employee inserted!\n");
-    }
-  );
+
+      console.log("New Department has been added");
+      start();
+    })
 }
 
-function updateEmployee(id, updateSection, update) {
-  console.log("Updating Employee...\n");
-  //if statement for what updateSection is equal to?
-  //prompt in start() for list of things to update?
-  var query = connection.query(
-    "UPDATE employee SET ? WHERE ?",
-    [
-      {
-        id: id
-      },
-      {
-        updateSection: update
-      }
-    ],
-    function(err, res) {
-      if (err) throw err;
-      console.log(res.affectedRows + " employee updated!\n");
-    }
-  );
-  // logs the actual query being run
-  console.log(query.sql);
-}
+// function updateEmployee(id, updateSection, update) {
+//   console.log("Updating Employee...\n");
+
+//   var query = connection.query(`UPDATE employee SET ${updateSection} = ${update} WHERE id = ${id}`);
+  
+//     connection.query(query, function(req, res) {
+//       if (err) throw err;
+  
+//       console.log("Employee has been updated");
+//       start();
+//     })
+// }
 
 function readEmployeeList() {
 
@@ -124,7 +106,6 @@ function readDepartmentList() {
 }
 
 function start() {
-  readEmployeeList();
 
   inquirer.prompt([
   {
@@ -177,11 +158,6 @@ function start() {
     inquirer.prompt([
       {
         type: "input",
-        name: "role",
-        message: "Enter in the new Role ID: "
-      },
-      {
-        type: "input",
         name: "title",
         message: "Enter in the Title for this Role: "
       },
@@ -196,33 +172,96 @@ function start() {
         message: "Enter in the Department that this role falls under: "
       }
     ]).then(function(roleInfo){
-      let newRole = roleInfo.role;
       let newTitle = roleInfo.title;
       let newSalary = roleInfo.salary;
       let roleDepartment = roleInfo.department; 
 
-      addNewRole(newRole, newTitle, newSalary, roleDepartment);
+      addNewRole(newTitle, newSalary, roleDepartment);
     })
   } else if (choice.initialmenu === "Add a New Department") {
     inquirer.prompt([
-      {
-        type: "input",
-        name: "departmentid",
-        message: "Enter in the new Department ID: "
-      },
       {
         type: "input",
         name: "departmentname",
         message: "Enter in the Name of the Department: "
       }
     ]).then(function(departmentInfo){
-      let newDepartmentId = departmentInfo.departmentid;
       let newDepartment = departmentInfo.departmentname; 
 
-      addNewDepartment(newDepartmentId, newDepartment);
+      addNewDepartment(newDepartment);
     })
   } else if (choice.initialmenu === "Update an Existing Employee") {
-    
+    inquirer.prompt([
+      {
+        type: "input",
+        name: "updateId",
+        message: "Please enter the ID of the employee you would like to update: "
+      },
+      {
+        type: "list",
+        name: "updateChoice",
+        message: "Please select which information you would like to update: ",
+        choices: [
+          "First Name",
+          "Last Name",
+          "Role ID",
+          "Manager ID"
+        ]
+      },
+      {
+        type: "input",
+        name: "update",
+        message: "Please enter in the updated information: "
+      }
+    ]).then(function(updateInfo){
+      if(updateInfo.updateChoice === "First Name") {
+        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
+          if(err) throw err;
+
+          connection.query("UPDATE employee SET first_name = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res){
+            if(err) throw err;
+
+            console.log("Employee Successfully Updated!");
+            start();
+          })
+        })
+      } else if(updateInfo.updateChoice === "Last Name") {
+        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
+          if(err) throw err;
+
+          connection.query("UPDATE employee SET last_name = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res){
+            if(err) throw err;
+
+            console.log("Employee Successfully Updated!");
+            start();
+          })
+        })
+      } else if(updateInfo.updateChoice === "Role ID") {
+        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
+          if(err) throw err;
+
+          connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res) {
+            if(err) throw err;
+
+            console.log("Employee Successfully Updated!");
+            start();
+          })
+        })
+      } else if(updateInfo.updateChoice === "Manager ID") {
+        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
+          if(err) throw err;
+
+          connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res){
+            if(err) throw err;
+
+            console.log("Employee Successfully Updated!");
+            start();
+          })
+        })
+      } else {
+        start();
+      }
+    })
   } else if (choice.initialmenu === "View Full Employee List") {
     readEmployeeList();
   } else if (choice.initialmenu === "View Full Role List") {
