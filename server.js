@@ -2,7 +2,7 @@ const mysql = require("mysql");
 const inquirer = require("inquirer");
 const Employee = require("./lib/employee");
 const Role = require("./lib/role");
-const Department = require("./lib/department")
+const Department = require("./lib/department");
 
 var connection = mysql.createConnection({
   host: "localhost",
@@ -16,97 +16,83 @@ connection.connect(function(error) {
   if (error) throw error;
   console.log("connected as id " + connection.threadId + "\n");
 
-  readEmployeeList();
+  console.log(`
+  ===========================================================================
+  --WELCOME--WELCOME--WELCOME--WELCOME--WELCOME--WELCOME--WELCOME--WELCOME--
+  ===========================================================================
+  `);
   start();
 });
 
 function addNewEmployee(first_name, last_name, role_id, manager_id) {
   console.log("Adding a new employee...\n");
   var query = connection.query(
-    `INSERT INTO employee(id, first_name, last_name, role_id, manager_id) VALUES (${first_name}, ${last_name}, ${role_id}, ${manager_id})`);
-
-    connection.query(query, function(req, res) {
-      if (err) throw err;
+    `INSERT INTO employee(first_name, last_name, role_id, manager_id) VALUES ("${first_name}", "${last_name}", ${role_id}, ${manager_id});`);
 
       console.log("New employee has been added");
-      start();
-    })
+      restart();
 }
 
 function addNewRole(thetitle, thesalary, thedepartmentid) {
   console.log("Adding a new role...\n");
   var query = connection.query(
-    `INSERT INTO role(title, salary, department_id) VALUES (${thetitle}, ${thesalary}, ${thedepartmentid})`);
-
-    connection.query(query, function(req, res) {
-      if (err) throw err;
+    `INSERT INTO role(title, salary, department_id) VALUES ("${thetitle}", ${thesalary}, ${thedepartmentid});`);
 
       console.log("New role has been added");
-      start();
-    })
+      restart();
 }
 
 function addNewDepartment(departmentName) {
   console.log("Adding a new department...\n");
   var query = connection.query(
-    `INSERT INTO department(name) VALUES (${departmentName})`);
-
-    connection.query(query, function(req, res) {
-      if (err) throw err;
+    `INSERT INTO department(name) VALUES ("${departmentName}");`);
 
       console.log("New Department has been added");
-      start();
-    })
+      restart();
 }
 
-// function updateEmployee(id, updateSection, update) {
-//   console.log("Updating Employee...\n");
-
-//   var query = connection.query(`UPDATE employee SET ${updateSection} = ${update} WHERE id = ${id}`);
-  
-//     connection.query(query, function(req, res) {
-//       if (err) throw err;
-  
-//       console.log("Employee has been updated");
-//       start();
-//     })
-// }
-
+//Show all employees in the system
 function readEmployeeList() {
-
   let employeesList = "SELECT * FROM employee";
 
   connection.query(employeesList, function(error, response) {
     if (error) throw error;
     // Log all results of the SELECT statement
     console.table(response);
+    start();
   });
 }
 
+//Show all roles in the system
 function readRoleList() {
-
   let roleList = "SELECT * FROM role";
 
   connection.query(roleList, function(error, response) {
     if (error) throw error;
     // Log all results of the SELECT statement
     console.table(response);
+    start();
   });
 }
 
+//Show all departments in the system
 function readDepartmentList() {
-
   let departmentList = "SELECT * FROM department";
 
   connection.query(departmentList, function(error, response) {
     if (error) throw error;
     // Log all results of the SELECT statement
     console.table(response);
+    start();
   });
 }
 
-function start() {
+function restart() {
+  start();
+}
 
+//App start
+function start() {
   inquirer.prompt([
   {
       type: "list",
@@ -222,7 +208,7 @@ function start() {
             if(err) throw err;
 
             console.log("Employee Successfully Updated!");
-            start();
+            restart();
           })
         })
       } else if(updateInfo.updateChoice === "Last Name") {
@@ -233,7 +219,7 @@ function start() {
             if(err) throw err;
 
             console.log("Employee Successfully Updated!");
-            start();
+            restart();
           })
         })
       } else if(updateInfo.updateChoice === "Role ID") {
@@ -244,7 +230,7 @@ function start() {
             if(err) throw err;
 
             console.log("Employee Successfully Updated!");
-            start();
+            restart();
           })
         })
       } else if(updateInfo.updateChoice === "Manager ID") {
@@ -255,23 +241,24 @@ function start() {
             if(err) throw err;
 
             console.log("Employee Successfully Updated!");
-            start();
+            restart();
           })
         })
       } else {
-        start();
+        restart();
       }
     })
   } else if (choice.initialmenu === "View Full Employee List") {
     readEmployeeList();
+    
   } else if (choice.initialmenu === "View Full Role List") {
     readRoleList();
+    
   } else if (choice.initialmenu === "View Full Department List") {
     readDepartmentList();
+
   } else if (choice.initialmenu === "Exit") {
     connection.end();
-  } else {
-    readEmployeeList();
-  }
+  } 
 })
 };

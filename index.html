@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Making An IndexedDB Connection</title>
+  </head>
+  <body>
+    <h1>Open Your Developer Tools > Application > IndexedDB</h1>
+  </body>
+</html>
+<script>
+    //my notes
+
+    //First parameter is the name of your database
+    //Second parameter is the version number of your database
+    //Creating database connection
+    const request = window.indexedDB.open("toDoList", 1);
+
+    //upgrade event
+    request.onupgradeneeded = event => {
+        console.log(event);
+        const db = event.target.result;
+        const objectStore = db.createObjectStore("tasks". {keyPath: "listID"});
+        objectStore.createIndex("statusIndex", "status");
+    }
+
+    //event is always the parameter for onsuccess
+    //Success event
+    request.onsuccess = event => {
+        const db = request.result;
+        const transaction = db.transaction(['tasks'], 'readwrite');
+        const objectStore = transaction.objectStore('tasks');
+        const statusIndex = objectStore.index("statusIndex");
+
+        //adding information into the database
+        //says that primary key for this item is listID
+        objectStore.add({listID: 1, status: "complete"});
+        objectStore.add({listID: 2, status: "in-progress"});
+        objectStore.add({listID: 3, status: "complete"});
+        objectStore.add({listID: 4, status: "backlog"});
+
+        const getRequestById = objectStore.get("1");
+        getRequestById.onsuccess = () => {
+            console.log(getRequestById.result);
+        }
+    }
+</script>
+
+<script>
+    // creating a database connection
+    const request = window.indexedDB.open("toDoList", 1);
+    // upgrade event
+    request.onupgradeneeded = event => {
+        const db = event.target.result;
+        // setting up the object store with primary keypath listID
+        const objectStore = db.createObjectStore("tasks", {keyPath: "listID"});
+        // creating indexes to search by status and by report
+        objectStore.createIndex("statusIndex", "status");
+        objectStore.createIndex("reportIndex", "report");
+    }
+    // success event
+    request.onsuccess = event => {
+        // gathering db resources
+        const db = request.result;
+        const transaction = db.transaction(['tasks'], 'readwrite');
+        // getting the object store
+        const objectStore = transaction.objectStore('tasks');
+        // getting the indexes
+        const statusIndex = objectStore.index("statusIndex");
+        const reportIndex = objectStore.index("reportIndex");
+        // adding information into the database
+        objectStore.add({listID: "1", status: "complete", report: "released"});
+        objectStore.add({listID: "2", status: "in-progress", report: "approved"});
+        objectStore.add({listID: "3", status: "complete", report: "rejected"});
+        objectStore.add({listID: "4", status: "backlog", report: "pending"});
+        // getting information using objectStore with listID as primary key
+        const getRequestById = objectStore.get("1");
+        getRequestById.onsuccess = () => {
+            console.log(getRequestById.result);
+        }
+        // getting information using status index to search by status
+        const getRequestByIndex = statusIndex.getAll('complete');
+        getRequestByIndex.onsuccess = () => {
+            console.log(getRequestByIndex.result);
+        }
+        // getting information using report index to search by report
+        const getRequestByReport = reportIndex.get("released");
+        getRequestByReport.onsuccess = () => {
+            console.log(getRequestByReport.result);
+        }
+        // getting information using a cursor
+        const getCursorRequest = objectStore.openCursor();
+        getCursorRequest.onsuccess = event => {
+            const cursor = event.target.result;
+            if (cursor) {
+                console.log(`Cursor Item:`, cursor.value);
+                cursor.continue();
+            } else {
+                console.log("No items left");
+            }
+        }
+    }
+</script>
