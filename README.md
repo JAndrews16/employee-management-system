@@ -3,7 +3,7 @@
 ## Description
 This is a CMS type application that allows users to track various details of all employees in their business. From their manager, role, salary and department, this will help business owners to keep track of their team. This is a command line application and is recommeded for small business usage.
 
-![Application Demo](./public/Assets/demo.gif)
+![Application Demo](./assets/demo.gif)
 
 ## Table of Contents
 - [Installation](#Installation)
