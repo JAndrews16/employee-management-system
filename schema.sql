@@ -27,7 +27,7 @@ CREATE TABLE department (
 );
 
 INSERT INTO employee(first_name, last_name, role_id, manager_id)
-VALUES ("Brooke", "Rodriguez", 1, 1), ("Saku", "Samuelson", 2, 6), ("Jordan", "Wilts", 7, NULL), ("Mike", "Thompson", 3, 4), ("Dave", "Williams", 4, NULL), ("Robert", "Mathers", 5, NULL), ("Angie", "Marks", 6, NULL);
+VALUES ("Brooke", "Rodriguez", 1, 1), ("Saku", "Samuelson", 2, 6), ("Jordan", "Wilts", 7, NULL), ("Mike", "Thompson", 3, 4), ("Dave", "Williams", 4, 3), ("Robert", "Mathers", 5, 3), ("Angie", "Marks", 6, 3);
 
 INSERT INTO role(title, salary, department_id)
 VALUES ("Design Engineer", 80000.00, 1), ("Engineering Manager", 125000.00, 1), ("Machinist", 90000.00, 2), ("Production Manager", 110000.00, 2), ("Quality Inspector", 80000.00, 3), ("Quality Manager", 125000, 3), ("Chief Officer Of Operations", 250000.00, 4);

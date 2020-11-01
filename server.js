@@ -8,7 +8,7 @@ var connection = mysql.createConnection({
   host: "localhost",
   port: 3306,
   user: "root",
-  password: "deuX17**",
+  password: "",
   database: "companyDB"
 });
 
@@ -102,7 +102,7 @@ function start() {
         "Add a New Employee",
         "Add a New Role",
         "Add a New Department",
-        "Update an Existing Employee",
+        "Update an Employee's Role",
         "View Full Employee List",
         "View Full Role List",
         "View Full Department List",
@@ -155,7 +155,7 @@ function start() {
       {
         type: "input",
         name: "department",
-        message: "Enter in the Department that this role falls under: "
+        message: "Enter in the ID of the Department that this role falls under: "
       }
     ]).then(function(roleInfo){
       let newTitle = roleInfo.title;
@@ -176,78 +176,27 @@ function start() {
 
       addNewDepartment(newDepartment);
     })
-  } else if (choice.initialmenu === "Update an Existing Employee") {
+  } 
+  else if (choice.initialmenu === "Update an Employee's Role") {
     inquirer.prompt([
       {
         type: "input",
         name: "updateId",
-        message: "Please enter the ID of the employee you would like to update: "
-      },
-      {
-        type: "list",
-        name: "updateChoice",
-        message: "Please select which information you would like to update: ",
-        choices: [
-          "First Name",
-          "Last Name",
-          "Role ID",
-          "Manager ID"
-        ]
+        message: "Please enter the id of the employee you would like to update: "
       },
       {
         type: "input",
-        name: "update",
-        message: "Please enter in the updated information: "
+        name: "newRoleId",
+        message: "Please enter the new role ID: "
       }
     ]).then(function(updateInfo){
-      if(updateInfo.updateChoice === "First Name") {
-        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
+        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [updateInfo.newRoleId, updateInfo.updateId], function(err, res){
           if(err) throw err;
 
-          connection.query("UPDATE employee SET first_name = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res){
-            if(err) throw err;
-
-            console.log("Employee Successfully Updated!");
-            restart();
-          })
+          console.log("Employee Successfully Updated!");
+          restart();
         })
-      } else if(updateInfo.updateChoice === "Last Name") {
-        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
-          if(err) throw err;
-
-          connection.query("UPDATE employee SET last_name = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res){
-            if(err) throw err;
-
-            console.log("Employee Successfully Updated!");
-            restart();
-          })
-        })
-      } else if(updateInfo.updateChoice === "Role ID") {
-        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
-          if(err) throw err;
-
-          connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res) {
-            if(err) throw err;
-
-            console.log("Employee Successfully Updated!");
-            restart();
-          })
-        })
-      } else if(updateInfo.updateChoice === "Manager ID") {
-        connection.query("SELECT FROM employee WHERE id = ?", updateInfo.updateId, function(err, res){
-          if(err) throw err;
-
-          connection.query("UPDATE employee SET manager_id = ? WHERE id = ?", [updateInfo.update, updateInfo.updateId], function(err, res){
-            if(err) throw err;
-
-            console.log("Employee Successfully Updated!");
-            restart();
-          })
-        })
-      } else {
-        restart();
-      }
-    })
+     })
   } else if (choice.initialmenu === "View Full Employee List") {
     readEmployeeList();
     
